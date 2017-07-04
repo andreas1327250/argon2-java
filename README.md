@@ -50,7 +50,7 @@ char[] password = readPassword();
 // Generate salt
 String salt = generateRandomSalt();
 
-// Hash password
+// Hash password - Builder pattern
 String hash = Argon2Factory.create()
             .setIterations(2)
             .setMemory(14)
@@ -88,7 +88,7 @@ The [blake2b Java implementation](https://github.com/alphazero/Blake2b) of [@alp
 * Performance
   * in Block.xorBlock(), the JIT actually already creates vector operations
 * Fix the build
-  * Build library without commons-dependency, build executable without
+  * Build library without commons-dependency, build executable with
   * maven central
   * add gradle support
 * Add Tests
