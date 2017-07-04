@@ -1,0 +1,91 @@
+
+########################
+# maven specific files #
+########################
+
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+###########
+# eclipse #
+###########
+
+.classpath
+.project
+.settings/
+
+############
+# intellij #
+############
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+############
+# binaries #
+############
+
+target/
+bin/
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+########
+# temp #
+########
+
+tmp/
+log/
+*.tmp
+*.log
+*.bak
+*.db
+
+#######
+# mac #
+#######
+
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+###########
+# windows #
+###########
+
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+#################
+# vm crash-dump #
+#################
+
+hs_err_pid*
+
+#################
+# tomcat #
+#################
+
+tomcat.8080/
+
+#################
+# aws #
+#################
+
+aws.properties
+
+
+.vagrant/
+Vagrantfile
