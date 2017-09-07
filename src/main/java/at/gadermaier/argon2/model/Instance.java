@@ -12,7 +12,6 @@ public class Instance {
     private int segmentLength;
     private int laneLength;
     private int lanes;
-    private int threads;
 
     private Argon2Type type;
 
@@ -20,13 +19,8 @@ public class Instance {
         this.version = argon2.getVersion();
         this.passes = argon2.getIterations();
         this.lanes = argon2.getLanes();
-        this.threads = argon2.getThreads();
         this.type = argon2.getType();
 
-        initMemory(argon2);
-    }
-
-    private void initMemory(Argon2 argon2) {
         /* 2. Align memory size */
         /* Minimum memoryBlocks = 8L blocks, where L is the number of lanes */
         int memoryBlocks = argon2.getMemory();
@@ -40,17 +34,22 @@ public class Instance {
         /* Ensure that all segments have equal length */
         memoryBlocks = segmentLength * (argon2.getLanes() * ARGON2_SYNC_POINTS);
 
+        initMemory(memoryBlocks);
+    }
+
+    private void initMemory(int memoryBlocks) {
         this.memory = new Block[memoryBlocks];
 
-        for(int i=0;i<memory.length;i++){
+        for (int i = 0; i < memory.length; i++) {
             memory[i] = new Block();
         }
     }
 
     public void clear() {
-        for(Block b: memory){
+        for (Block b : memory) {
             b.clear();
         }
+
         memory = null;
     }
 
@@ -76,10 +75,6 @@ public class Instance {
 
     public int getLanes() {
         return lanes;
-    }
-
-    public int getThreads() {
-        return threads;
     }
 
     public Argon2Type getType() {

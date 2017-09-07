@@ -4,24 +4,19 @@ import at.gadermaier.argon2.model.Block;
 
 class FillBlock {
 
-    static void fillBlock(Block prevBlock, Block refBlock, Block nextBlock, boolean withXor) {
+    static void fillBlock(Block X, Block Y, Block currentBlock, boolean withXor) {
 
-        Block blockR = new Block();
-        Block blockTmp = new Block();
+        Block R = new Block();
+        Block Z = new Block();
 
-        blockR.copyBlock(refBlock);
-        blockR.xorBlock(prevBlock);
-        blockTmp.copyBlock(blockR);
-
-        if (withXor) {
-            blockTmp.xorBlock(nextBlock);
-        }
+        R.xor(X, Y);
+        Z.copyBlock(R);
 
         /* Apply Blake2 on columns of 64-bit words: (0,1,...,15) , then
         (16,17,..31)... finally (112,113,...127) */
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < 8; i++) {
 
-            Functions.roundFunction(blockR,
+            Functions.roundFunction(Z,
                     16 * i, 16 * i + 1, 16 * i + 2,
                     16 * i + 3, 16 * i + 4, 16 * i + 5,
                     16 * i + 6, 16 * i + 7, 16 * i + 8,
@@ -35,7 +30,7 @@ class FillBlock {
         (2,3,18,19,...,114,115).. finally (14,15,30,31,...,126,127) */
         for (int i = 0; i < 8; i++) {
 
-            Functions.roundFunction(blockR,
+            Functions.roundFunction(Z,
                     2 * i, 2 * i + 1, 2 * i + 16,
                     2 * i + 17, 2 * i + 32, 2 * i + 33,
                     2 * i + 48, 2 * i + 49, 2 * i + 64,
@@ -44,8 +39,12 @@ class FillBlock {
                     2 * i + 113
             );
 
-            nextBlock.copyBlock(blockTmp);
-            nextBlock.xorBlock(blockR);
+        }
+
+        if (withXor) {
+            currentBlock.xor(R, Z, currentBlock);
+        } else {
+            currentBlock.xor(R, Z);
         }
     }
 }

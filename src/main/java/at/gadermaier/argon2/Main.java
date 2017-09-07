@@ -1,6 +1,7 @@
 package at.gadermaier.argon2;
 
-import java.io.*;
+import java.io.Console;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {

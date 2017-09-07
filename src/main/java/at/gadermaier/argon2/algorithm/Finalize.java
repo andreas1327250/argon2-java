@@ -1,8 +1,8 @@
 package at.gadermaier.argon2.algorithm;
 
 import at.gadermaier.argon2.Argon2;
-import at.gadermaier.argon2.model.Instance;
 import at.gadermaier.argon2.model.Block;
+import at.gadermaier.argon2.model.Instance;
 
 public class Finalize {
 

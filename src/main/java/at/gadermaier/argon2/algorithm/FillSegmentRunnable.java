@@ -1,17 +1,20 @@
 package at.gadermaier.argon2.algorithm;
 
-import at.gadermaier.argon2.model.ThreadData;
+import at.gadermaier.argon2.model.Instance;
+import at.gadermaier.argon2.model.Position;
 
 public class FillSegmentRunnable implements Runnable {
 
-    private ThreadData threadData;
+    private Instance instance;
+    private Position position;
 
-    FillSegmentRunnable(ThreadData threadData) {
-        this.threadData = threadData;
+    FillSegmentRunnable(Instance instance, Position position) {
+        this.instance = instance;
+        this.position = position;
     }
 
     @Override
     public void run() {
-        FillSegment.fillSegment(threadData.instance, threadData.position);
+        FillSegment.fillSegment(instance, position);
     }
 }

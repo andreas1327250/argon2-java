@@ -27,7 +27,6 @@ public class Argon2 {
     private int iterations; // -t N
     private int memory; // -m N
     private int lanes; // -p N
-    private int threads; // -p N
 
     private int version; // -v (10/13)
     private Argon2Type type;
@@ -41,13 +40,22 @@ public class Argon2 {
     Argon2() {
         this.lanes = LANES_DEF;
         this.outputLength = OUTLEN_DEF;
-        this.threads = LANES_DEF;
         this.memory = 1 << LOG_M_COST_DEF;
         this.iterations = T_COST_DEF;
         this.version = VERSION_DEF;
         this.type = TYPE_DEF;
     }
 
+    private static byte[] toByteArray(char[] chars, Charset charset) {
+        assert chars != null;
+
+        CharBuffer charBuffer = CharBuffer.wrap(chars);
+        ByteBuffer byteBuffer = charset.encode(charBuffer);
+        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
+                byteBuffer.position(), byteBuffer.limit());
+        Arrays.fill(byteBuffer.array(), (byte) 0);
+        return bytes;
+    }
 
     public String hash(byte[] password, byte[] salt){
         setPassword(password);
@@ -86,7 +94,6 @@ public class Argon2 {
         duration = (System.nanoTime() - start) / 1000000000.0;
     }
 
-
     public void clear() {
         if(password != null)
             Arrays.fill(password, 0, password.length-1, (byte)0);
@@ -117,80 +124,30 @@ public class Argon2 {
         }
     }
 
-    public Argon2 setMemory(int memory){
-        this.memory = 1 << memory;
-        return this;
-    }
-
     public Argon2 setMemoryInKiB(int memory) {
         this.memory = memory;
         return this;
     }
 
-    public Argon2 setIterations(int iterations){
-        this.iterations = iterations;
-        return this;
-    }
-
     public Argon2 setParallelism(int parallelism){
-        this.threads = parallelism;
         this.lanes = parallelism;
         return this;
-    }
-
-    public Argon2 setType(Argon2Type type){
-        this.type = type;
-        return this;
-    }
-
-    public Argon2 setVersion(int version){
-        this.version = version;
-        return this;
-    }
-
-    public Argon2 setOutputLength(int outputLength) {
-        this.outputLength = outputLength;
-        return this;
-    }
-
-    public void setOutput(byte[] finalResult) {
-        this.output = finalResult;
     }
 
     public Argon2 setPassword(char[] password) {
         return setPassword(toByteArray(password, charset));
     }
 
-    public Argon2 setPassword(byte[] password){
-        this.password = password;
-        return this;
-    }
-
     public Argon2 setSalt(String salt) {
         return setSalt(salt.getBytes(charset));
     }
 
-    public Argon2 setSalt(byte[] salt){
-        this.salt = salt;
-        return this;
-    }
-
-    public Argon2 setSecret(byte[] secret){
-        this.secret = secret;
-        return this;
-    }
-
-    public Argon2 setAdditional(byte[] additional){
-        this.additional = additional;
-        return this;
-    }
-
-    public void setClearMemory(boolean clearMemory) {
-        this.clearMemory = clearMemory;
-    }
-
     public byte[] getOutput() {
         return output;
+    }
+
+    public void setOutput(byte[] finalResult) {
+        this.output = finalResult;
     }
 
     public String getOutputString() {
@@ -201,8 +158,18 @@ public class Argon2 {
         return outputLength;
     }
 
+    public Argon2 setOutputLength(int outputLength) {
+        this.outputLength = outputLength;
+        return this;
+    }
+
     public byte[] getPassword() {
         return password;
+    }
+
+    public Argon2 setPassword(byte[] password) {
+        this.password = password;
+        return this;
     }
 
     public int getPasswordLength() {
@@ -213,12 +180,22 @@ public class Argon2 {
         return salt;
     }
 
+    public Argon2 setSalt(byte[] salt) {
+        this.salt = salt;
+        return this;
+    }
+
     public int getSaltLength() {
         return salt.length;
     }
 
     public byte[] getSecret() {
         return secret;
+    }
+
+    public Argon2 setSecret(byte[] secret) {
+        this.secret = secret;
+        return this;
     }
 
     public int getSecretLength() {
@@ -229,6 +206,11 @@ public class Argon2 {
         return additional;
     }
 
+    public Argon2 setAdditional(byte[] additional) {
+        this.additional = additional;
+        return this;
+    }
+
     public int getAdditionalLength() {
         return additional  != null ? additional.length : 0;
     }
@@ -237,28 +219,48 @@ public class Argon2 {
         return iterations;
     }
 
+    public Argon2 setIterations(int iterations) {
+        this.iterations = iterations;
+        return this;
+    }
+
     public int getMemory() {
         return memory;
+    }
+
+    public Argon2 setMemory(int memory) {
+        this.memory = 1 << memory;
+        return this;
     }
 
     public int getLanes() {
         return lanes;
     }
 
-    public int getThreads() {
-        return threads;
-    }
-
     public int getVersion() {
         return version;
+    }
+
+    public Argon2 setVersion(int version) {
+        this.version = version;
+        return this;
     }
 
     public Argon2Type getType() {
         return type;
     }
 
+    public Argon2 setType(Argon2Type type) {
+        this.type = type;
+        return this;
+    }
+
     public boolean isClearMemory() {
         return clearMemory;
+    }
+
+    public void setClearMemory(boolean clearMemory) {
+        this.clearMemory = clearMemory;
     }
 
     public Charset getCharset() {
@@ -271,17 +273,6 @@ public class Argon2 {
 
     public void setRawOnly(boolean rawOnly) {
         this.rawOnly = rawOnly;
-    }
-
-    private static byte[] toByteArray(char[] chars, Charset charset) {
-        assert chars != null;
-
-        CharBuffer charBuffer = CharBuffer.wrap(chars);
-        ByteBuffer byteBuffer = charset.encode(charBuffer);
-        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
-                byteBuffer.position(), byteBuffer.limit());
-        Arrays.fill(byteBuffer.array(), (byte) 0);
-        return bytes;
     }
 
     public String getEncoded() {

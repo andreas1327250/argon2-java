@@ -1,7 +1,5 @@
 package at.gadermaier.argon2;
 
-import java.util.Arrays;
-
 public class Util {
 
     public static String bytesToHexString(byte[] bytes) {
@@ -60,12 +58,5 @@ public class Util {
         return littleEndianBytesToLong(bytes);
     }
 
-    public static long byteToLong(byte b){
-        byte[] byteBytes = new byte[8];
-        byteBytes[0] = b;
-        byte[] bytes = new byte[8];
-        System.arraycopy(byteBytes, 0, bytes, 0, 4);
-        return littleEndianBytesToLong(bytes);
-    }
 }
 

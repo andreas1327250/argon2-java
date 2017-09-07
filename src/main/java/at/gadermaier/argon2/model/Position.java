@@ -4,10 +4,10 @@ public class Position {
 
     public int pass;
     public int lane;
-    public byte slice;
+    public int slice;
     public int index;
 
-    public Position(int pass, int lane, byte slice, int index) {
+    public Position(int pass, int lane, int slice, int index) {
         this.pass = pass;
         this.lane = lane;
         this.slice = slice;

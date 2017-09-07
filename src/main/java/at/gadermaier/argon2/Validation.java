@@ -10,9 +10,9 @@ class Validation {
     static void validateInput(Argon2 argon2){
         String message = null;
 
-        if(argon2.getLanes() < MIN_PARALLELISM || argon2.getThreads() < MIN_PARALLELISM)
+        if (argon2.getLanes() < MIN_PARALLELISM)
             message = P_MIN_MSG;
-        else if(argon2.getLanes() > MAX_PARALLELISM || argon2.getThreads() > MAX_PARALLELISM)
+        else if (argon2.getLanes() > MAX_PARALLELISM)
             message = P_MAX_MSG;
         else if(argon2.getMemory() < 2 * argon2.getLanes())
             message = M_MIN_MSG;

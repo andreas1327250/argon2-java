@@ -1,5 +1,4 @@
 import at.gadermaier.argon2.Argon2;
-import at.gadermaier.argon2.Argon2ArgumentFactory;
 import at.gadermaier.argon2.Argon2Factory;
 import org.junit.Before;
 
