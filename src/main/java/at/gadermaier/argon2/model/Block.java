@@ -53,7 +53,7 @@ public class Block {
         }
     }
 
-    public void xorBlock(Block other) {
+    public void xorWith(Block other) {
         for (int i = 0; i < v.length; i++) {
             v[i] = v[i] ^ other.v[i];
         }

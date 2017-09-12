@@ -8,7 +8,7 @@ public class Instance {
 
     public Block[] memory;
     private int version;
-    private int passes;
+    private int iterations;
     private int segmentLength;
     private int laneLength;
     private int lanes;
@@ -17,7 +17,7 @@ public class Instance {
 
     public Instance(Argon2 argon2) {
         this.version = argon2.getVersion();
-        this.passes = argon2.getIterations();
+        this.iterations = argon2.getIterations();
         this.lanes = argon2.getLanes();
         this.type = argon2.getType();
 
@@ -61,8 +61,8 @@ public class Instance {
         return version;
     }
 
-    public int getPasses() {
-        return passes;
+    public int getIterations() {
+        return iterations;
     }
 
     public int getSegmentLength() {

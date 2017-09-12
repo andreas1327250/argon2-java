@@ -3,12 +3,18 @@ package at.gadermaier.argon2.algorithm;
 import at.gadermaier.argon2.model.Instance;
 import at.gadermaier.argon2.model.Position;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import static at.gadermaier.argon2.Constants.ARGON2_SYNC_POINTS;
 
 public class FillMemory {
 
     public static void fillMemoryBlocks(Instance instance) {
-
         if (instance.getLanes() == 1) {
             fillMemoryBlockSingleThreaded(instance);
         } else {
@@ -17,7 +23,7 @@ public class FillMemory {
     }
 
     private static void fillMemoryBlockSingleThreaded(Instance instance) {
-        for (int i = 0; i < instance.getPasses(); i++) {
+        for (int i = 0; i < instance.getIterations(); i++) {
             for (int j = 0; j < ARGON2_SYNC_POINTS; j++) {
                 Position position = new Position(i, 0, j, 0);
                 FillSegment.fillSegment(instance, position);
@@ -25,31 +31,45 @@ public class FillMemory {
         }
     }
 
-    private static void fillMemoryBlockMultiThreaded(Instance instance) {
+    private static void fillMemoryBlockMultiThreaded(final Instance instance) {
 
-        Thread[] threads = new Thread[instance.getLanes()];
+        ExecutorService service = Executors.newFixedThreadPool(instance.getLanes());
+        List<Future<?>> futures = new ArrayList<Future<?>>();
 
-        for (int i = 0; i < instance.getPasses(); i++) {
+        for (int i = 0; i < instance.getIterations(); i++) {
             for (int j = 0; j < ARGON2_SYNC_POINTS; j++) {
                 for (int k = 0; k < instance.getLanes(); k++) {
 
-                    /* Create thread */
-                    Position position = new Position(i, k, j, 0);
-                    FillSegmentRunnable runnable = new FillSegmentRunnable(instance, position);
+                    final Position position = new Position(i, k, j, 0);
 
-                    threads[k] = new Thread(runnable);
-                    threads[k].start();
+                    Future future = service.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            FillSegment.fillSegment(instance, position);
+                        }
+                    });
+
+                    futures.add(future);
                 }
 
-                /* Joining remaining threads */
-                for (int k = 0; k < instance.getLanes(); k++) {
-                    try {
-                        threads[k].join();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                joinThreads(instance, futures);
             }
+        }
+
+        service.shutdownNow();
+    }
+
+    private static void joinThreads(Instance instance, List<Future<?>> futures) {
+        try {
+            for (Future<?> f : futures) {
+                f.get();
+            }
+        } catch (InterruptedException e) {
+            instance.clear();
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            instance.clear();
+            throw new RuntimeException(e);
         }
     }
 }

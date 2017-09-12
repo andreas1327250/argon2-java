@@ -8,10 +8,6 @@ import static at.gadermaier.argon2.Constants.*;
 
 public class Initialize {
 
-//    public static void initialize(Instance instance, Argon2 argon2){
-//        byte[] initialHash = Functions.initialHash(argon2);
-//        fillFirstBlocks(instance, initialHash);
-//    }
 
     public static void initialize(Instance instance, Argon2 argon2) {
         byte[] initialHash = Functions.initialHash(
