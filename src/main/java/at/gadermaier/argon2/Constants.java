@@ -22,12 +22,6 @@ public class Constants {
     public static final int ARGON2_VERSION_10 = 0x10;
     public static final int ARGON2_VERSION_13 = 0x13;
 
-    /* Max memory size is addressing-space/2, topping at 2^32 blocks (4 TB) */
-    //public static int ARGON2_MAX_MEMORY_BITS                                                 \
-    //ARGON2_MIN(UINT32_C(32), (sizeof(void *) * CHAR_BIT - 10 - 1))
-    //public static int ARGON2_MAX_MEMORY                                                      \
-    //ARGON2_MIN(UINT32_C(0xFFFFFFFF), UINT64_C(1) << ARGON2_MAX_MEMORY_BITS)
-
     public static class Defaults {
 
         public static final int OUTLEN_DEF = 32;

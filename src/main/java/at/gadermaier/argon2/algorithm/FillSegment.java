@@ -35,11 +35,11 @@ class FillSegment {
 
             long pseudoRandom = getPseudoRandom(instance, position, addressBlock, inputBlock, zeroBlock, prevOffset, dataIndependentAddressing);
             int refLane = getRefLane(instance, position, pseudoRandom);
-            int refIndex = getRefIndex(instance, position, pseudoRandom, refLane == position.lane);
+            int refColumn = getRefColumn(instance, position, pseudoRandom, refLane == position.lane);
 
             /* 2 Creating a new block */
             Block prevBlock = instance.memory[prevOffset];
-            Block refBlock = instance.memory[((instance.getLaneLength()) * refLane + refIndex)];
+            Block refBlock = instance.memory[((instance.getLaneLength()) * refLane + refColumn)];
             Block currentBlock = instance.memory[currentOffset];
 
             boolean withXor = isWithXor(instance, position);
@@ -70,11 +70,7 @@ class FillSegment {
     }
 
     private static boolean isWithXor(Instance instance, Position position) {
-        if (position.pass == 0 || instance.getVersion() == ARGON2_VERSION_10) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(position.pass == 0 || instance.getVersion() == ARGON2_VERSION_10);
     }
 
     private static int getPrevOffset(Instance instance, int currentOffset) {
@@ -122,7 +118,6 @@ class FillSegment {
     }
 
     private static int getRefLane(Instance instance, Position position, long pseudoRandom) {
-        /* 1.2.2 Computing the lane of the reference block */
         int refLane = (int) (((pseudoRandom >>> 32)) % instance.getLanes());
 
         if ((position.pass == 0) && (position.slice == 0)) {
@@ -132,28 +127,13 @@ class FillSegment {
         return refLane;
     }
 
-    /* 1.2.3 Computing the number of possible reference block within the
-     * lane.
-     */
-    private static int getRefIndex(Instance instance, Position position, long pseudoRand,
-                                   boolean sameLane) {
-        /*
-         * Pass 0:
-         *      This lane : all already finished segments plus already constructed
-         * blocks in this segment
-         *      Other lanes : all already finished segments
-         * Pass 1+:
-         *      This lane : (SYNC_POINTS - 1) last segments plus already constructed
-         * blocks in this segment
-         *      Other lanes : (SYNC_POINTS - 1) last segments
-         */
+    private static int getRefColumn(Instance instance, Position position, long pseudoRandom,
+                                    boolean sameLane) {
+
         int referenceAreaSize;
-        long relativePosition;
-        int startPosition, absolutePosition;
+        int startPosition;
 
         if (position.pass == 0) {
-            /* First pass */
-            /* 1.2.5 Computing starting position */
             startPosition = 0;
 
             if (sameLane) {
@@ -165,8 +145,6 @@ class FillSegment {
             }
 
         } else {
-            /* Other passes */
-            /* 1.2.5 Computing starting position */
             startPosition = ((position.slice + 1) * instance.getSegmentLength()) % instance.getLaneLength();
 
             if (sameLane) {
@@ -176,25 +154,12 @@ class FillSegment {
             }
         }
 
-
-    /* 1.2.4. Mapping pseudoRand to 0..<referenceAreaSize-1> and produce
-     * relative position */
-
-    /* long in java is a signed datatype
-     * we need to convert it to the unsigned value
-     */
-
-//        relativePosition = pseudoRand & 0xFFFFFFFFL;
-        relativePosition = pseudoRand << 32 >>> 32;
-        relativePosition = relativePosition * relativePosition;
-        relativePosition = relativePosition >>> 32;
+        long relativePosition = pseudoRandom & 0xFFFFFFFFL;
+//        long relativePosition = pseudoRandom << 32 >>> 32;
+        relativePosition = (relativePosition * relativePosition) >>> 32;
         relativePosition = referenceAreaSize - 1 - (referenceAreaSize * relativePosition >>> 32);
 
-         /* 1.2.6. Computing absolute position */
-        absolutePosition = (int) (startPosition + relativePosition) %
-                instance.getLaneLength(); /* absolute position */
-
-        return absolutePosition;
+        return (int) (startPosition + relativePosition) % instance.getLaneLength();
     }
 
 }

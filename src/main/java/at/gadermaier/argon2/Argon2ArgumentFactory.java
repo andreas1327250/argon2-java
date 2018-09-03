@@ -3,6 +3,8 @@ package at.gadermaier.argon2;
 import at.gadermaier.argon2.model.Argon2Type;
 import org.apache.commons.cli.*;
 
+import static java.lang.Integer.parseInt;
+
 public class Argon2ArgumentFactory {
 
     static Argon2 parseArguments(String[] args){
@@ -41,17 +43,17 @@ public class Argon2ArgumentFactory {
             throw new ParseException("usage");
 
         if(commandLine.hasOption("t")){
-            argon2.setIterations(Integer.parseInt(commandLine.getOptionValue("t")));
+            argon2.setIterations(parseInt(commandLine.getOptionValue("t")));
         }
 
         if(commandLine.hasOption("p")){
-            argon2.setParallelism(Integer.parseInt(commandLine.getOptionValue("p")));
+            argon2.setParallelism(parseInt(commandLine.getOptionValue("p")));
         }
 
         if(commandLine.hasOption("m")){
-            argon2.setMemory(Integer.parseInt(commandLine.getOptionValue("m")));
+            argon2.setMemory(parseInt(commandLine.getOptionValue("m")));
         }else if(commandLine.hasOption("k")){
-            int k = Integer.parseInt(commandLine.getOptionValue("k"));
+            int k = parseInt(commandLine.getOptionValue("k"));
             if(k % 4*argon2.getLanes() != 0)
                 throw new ParseException("k must be a multiple of p*4");
             argon2.setMemoryInKiB(k);
@@ -72,8 +74,12 @@ public class Argon2ArgumentFactory {
             argon2.setType(Argon2Type.Argon2id);
         }
 
+        if (commandLine.hasOption(("l"))) {
+            argon2.setOutputLength(parseInt(commandLine.getOptionValue("l")));
+        }
+
         if(commandLine.hasOption("v")){
-            int version = Integer.parseInt(commandLine.getOptionValue("v"));
+            int version = parseInt(commandLine.getOptionValue("v"));
             if (!(version == 10 || version == 13)) {
                 bailOut("wrong version");
             }

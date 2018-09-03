@@ -3,7 +3,8 @@ package at.gadermaier.argon2;
 import at.gadermaier.argon2.model.Argon2Type;
 
 import static at.gadermaier.argon2.Constants.Defaults.ARGON2_VERSION_NUMBER;
-import static at.gadermaier.argon2.model.Argon2Type.*;
+import static at.gadermaier.argon2.model.Argon2Type.Argon2d;
+import static at.gadermaier.argon2.model.Argon2Type.Argon2i;
 
 public class Benchmark {
 
@@ -28,7 +29,7 @@ public class Benchmark {
         int t_cost = 3;
         int m_cost;
         int[] thread_test = new int[]{1, 2, 4, 8};
-        Argon2Type[] types = new Argon2Type[]{Argon2i, Argon2d, Argon2id};
+        Argon2Type[] types = new Argon2Type[]{Argon2i, Argon2d};
 
         byte[] pwdBytes = new byte[inlen];
         byte[] saltBytes = new byte[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -56,7 +57,7 @@ public class Benchmark {
     private static void run(int outlen, int t_cost, int m_cost, Argon2Type[] types, byte[] pwdBytes, byte[] saltBytes, double run_time, int thread_n, int runs) {
         for(int averageIndex=0; averageIndex<runs; averageIndex++){
 
-            for (int typeIndex = 0; typeIndex < 3; ++typeIndex) {
+            for (int typeIndex = 0; typeIndex < 2; ++typeIndex) {
                 long start_time, stop_time;
 
                 Argon2Type type = types[typeIndex];

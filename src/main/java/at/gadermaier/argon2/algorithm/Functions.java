@@ -82,7 +82,7 @@ class Functions {
             outBuffer = blake2b(input, outlenBytes, blake2bLength);
             System.arraycopy(outBuffer, 0, result, 0, blake2bLength / 2);
 
-            int r = outputLength / 32 - 2;
+            int r = (outputLength / 32) + (outputLength % 32 == 0 ? 0 : 1) - 2;
 
             int position = blake2bLength / 2;
             for (int i = 2; i <= r; i++, position += blake2bLength / 2) {
