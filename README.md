@@ -98,4 +98,4 @@ The [blake2b Java implementation](https://github.com/alphazero/Blake2b) of [@alp
 ## Contact
 [@andreas1327250](https://github.com/andreas1327250)
 
-e1327250@student.tuwien.ac.at
+up.gadermaier@gmail.com
