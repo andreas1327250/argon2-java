@@ -1,3 +1,14 @@
+Fork of [https://github.com/andreas1327250/argon2-java]()
+
+* Refactored to be used as a library
+* Removed commons-cli
+
+License: MIT
+
+
+================ ↓↓↓ Original Documentation ↓↓↓ ================
+
+
 # Argon2 Java implementation
 
 This is a pure Java implementation of [Argon2](https://github.com/P-H-C/phc-winner-argon2). It targets Java 6.

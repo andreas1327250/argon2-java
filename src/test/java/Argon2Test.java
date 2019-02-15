@@ -1,5 +1,5 @@
 import at.gadermaier.argon2.Argon2Factory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static at.gadermaier.argon2.Constants.ARGON2_VERSION_10;
 import static at.gadermaier.argon2.Constants.Defaults.ARGON2_VERSION_NUMBER;
