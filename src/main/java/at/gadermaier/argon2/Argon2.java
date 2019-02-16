@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,15 +41,23 @@ public class Argon2 {
     private boolean encodedOnly = false;
     private boolean rawOnly = false;
 
-    private ExecutorService executor = Executors.newCachedThreadPool();
+    private ExecutorService executor;
 
-    public Argon2() {
+    private static final class ExecutorHolder {
+        private static final ExecutorService executor = Executors.newCachedThreadPool();
+    }
+
+    Argon2() {
         this.lanes = LANES_DEF;
         this.outputLength = OUTLEN_DEF;
         this.memory = 1 << LOG_M_COST_DEF;
         this.iterations = T_COST_DEF;
         this.version = VERSION_DEF;
         this.type = TYPE_DEF;
+    }
+
+    public static Argon2 create() {
+        return new Argon2();
     }
 
     private static byte[] toByteArray(char[] chars, Charset charset) {
@@ -76,6 +85,13 @@ public class Argon2 {
         return hash();
     }
 
+    public String hash(String password, String salt) {
+        setPassword( password.getBytes( charset ) );
+        setSalt( salt );
+
+        return hash();
+    }
+
     public String hash() {
         try {
             argon2_hash();
@@ -86,6 +102,11 @@ public class Argon2 {
     }
 
     private void argon2_hash() {
+
+        if (executor == null) {
+            executor = ExecutorHolder.executor;
+        }
+
         Validation.validateInput(this);
 
         long start = System.nanoTime();
@@ -282,5 +303,14 @@ public class Argon2 {
 
     public String getEncoded() {
         return ""; //TODO
+    }
+
+    public Executor getExecutor() {
+        return executor;
+    }
+
+    public Argon2 setExecutor(ExecutorService executor) {
+        this.executor = executor;
+        return this;
     }
 }

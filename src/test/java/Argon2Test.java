@@ -112,7 +112,7 @@ public class Argon2Test {
                           String password, String salt, String passwordRef, String mcfref, int outputLength) {
 
 
-        String result = new Argon2()
+        String result = Argon2.create()
                 .setVersion(version)
                 .setIterations(iterations)
                 .setMemory(memory)

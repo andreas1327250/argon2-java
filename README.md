@@ -3,6 +3,24 @@ Fork of [https://github.com/andreas1327250/argon2-java]()
 * Refactored to be used as a library
 * Removed commons-cli
 
+
+```java
+public class Example {
+    
+    private static final ExecutorService executor = Executors.newCachedThreadPool();
+    
+    public static void example1() {
+        
+        String password = "password";
+        String salt = "somesalt";
+        
+        Argon2 hasher = Argon2.create().setExecutor(executor);
+        byte[] hash = hasher.hashAsBytes(password, salt);
+    }
+}
+```
+
+
 License: MIT (Same as original)
 
 

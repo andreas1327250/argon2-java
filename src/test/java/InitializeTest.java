@@ -14,8 +14,9 @@ public class InitializeTest {
 
     @BeforeEach
     public void setUp(){
-        argon2 = new Argon2().setPassword("password".toCharArray())
-                             .setSalt("saltsalt");
+        argon2 = Argon2.create()
+                       .setPassword("password".toCharArray())
+                       .setSalt("saltsalt");
     }
 
     @Test
