@@ -10,8 +10,11 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static at.gadermaier.argon2.Constants.Defaults.*;
+
 
 public class Argon2 {
 
@@ -37,7 +40,9 @@ public class Argon2 {
     private boolean encodedOnly = false;
     private boolean rawOnly = false;
 
-    Argon2() {
+    private ExecutorService executor = Executors.newCachedThreadPool();
+
+    public Argon2() {
         this.lanes = LANES_DEF;
         this.outputLength = OUTLEN_DEF;
         this.memory = 1 << LOG_M_COST_DEF;
@@ -75,7 +80,7 @@ public class Argon2 {
         try {
             argon2_hash();
             return getOutputString();
-        }finally {
+        } finally {
             clear();
         }
     }
@@ -88,7 +93,7 @@ public class Argon2 {
         Instance instance = new Instance(this);
 
         Initialize.initialize(instance, this);
-        FillMemory.fillMemoryBlocks(instance);
+        FillMemory.fillMemoryBlocks(instance, executor);
         Finalize.finalize(instance, this);
 
         duration = (System.nanoTime() - start) / 1000000000.0;

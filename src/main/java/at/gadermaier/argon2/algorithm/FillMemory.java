@@ -7,18 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static at.gadermaier.argon2.Constants.ARGON2_SYNC_POINTS;
 
 public class FillMemory {
 
-    public static void fillMemoryBlocks(Instance instance) {
+    public static void fillMemoryBlocks(Instance instance, ExecutorService executor) {
         if (instance.getLanes() == 1) {
             fillMemoryBlockSingleThreaded(instance);
         } else {
-            fillMemoryBlockMultiThreaded(instance);
+            fillMemoryBlockMultiThreaded(instance, executor);
         }
     }
 
@@ -31,9 +30,8 @@ public class FillMemory {
         }
     }
 
-    private static void fillMemoryBlockMultiThreaded(final Instance instance) {
+    private static void fillMemoryBlockMultiThreaded(final Instance instance, ExecutorService executor) {
 
-        ExecutorService service = Executors.newFixedThreadPool(instance.getLanes());
         List<Future<?>> futures = new ArrayList<Future<?>>();
 
         for (int i = 0; i < instance.getIterations(); i++) {
@@ -42,7 +40,7 @@ public class FillMemory {
 
                     final Position position = new Position(i, k, j, 0);
 
-                    Future future = service.submit(new Runnable() {
+                    Future future = executor.submit(new Runnable() {
                         @Override
                         public void run() {
                             FillSegment.fillSegment(instance, position);
@@ -55,8 +53,6 @@ public class FillMemory {
                 joinThreads(instance, futures);
             }
         }
-
-        service.shutdownNow();
     }
 
     private static void joinThreads(Instance instance, List<Future<?>> futures) {

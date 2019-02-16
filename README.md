@@ -3,7 +3,7 @@ Fork of [https://github.com/andreas1327250/argon2-java]()
 * Refactored to be used as a library
 * Removed commons-cli
 
-License: MIT
+License: MIT (Same as original)
 
 
 ================ ↓↓↓ Original Documentation ↓↓↓ ================

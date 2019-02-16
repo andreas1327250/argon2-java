@@ -1,4 +1,4 @@
-import at.gadermaier.argon2.Argon2Factory;
+import at.gadermaier.argon2.Argon2;
 import org.junit.jupiter.api.Test;
 
 import static at.gadermaier.argon2.Constants.ARGON2_VERSION_10;
@@ -112,7 +112,7 @@ public class Argon2Test {
                           String password, String salt, String passwordRef, String mcfref, int outputLength) {
 
 
-        String result = Argon2Factory.create()
+        String result = new Argon2()
                 .setVersion(version)
                 .setIterations(iterations)
                 .setMemory(memory)
