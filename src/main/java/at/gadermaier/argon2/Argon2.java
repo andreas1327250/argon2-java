@@ -6,8 +6,6 @@ import at.gadermaier.argon2.algorithm.Initialize;
 import at.gadermaier.argon2.model.Argon2Type;
 import at.gadermaier.argon2.model.Instance;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
@@ -15,13 +13,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static at.gadermaier.argon2.Constants.Defaults.*;
+import static at.gadermaier.argon2.Util.clearArray;
+import static at.gadermaier.argon2.Util.toByteArray;
 
 
 public class Argon2 {
 
     private byte[] output;
     private int outputLength; // -l N
-    private double duration;
 
     private byte[] password;
     private byte[] salt;
@@ -38,16 +37,13 @@ public class Argon2 {
     private boolean clearMemory = true;
     private Charset charset = Charset.forName("UTF-8");
 
-    private boolean encodedOnly = false;
-    private boolean rawOnly = false;
-
     private ExecutorService executor;
 
     private static final class ExecutorHolder {
         private static final ExecutorService executor = Executors.newCachedThreadPool();
     }
 
-    Argon2() {
+    private Argon2() {
         this.lanes = LANES_DEF;
         this.outputLength = OUTLEN_DEF;
         this.memory = 1 << LOG_M_COST_DEF;
@@ -60,42 +56,36 @@ public class Argon2 {
         return new Argon2();
     }
 
-    private static byte[] toByteArray(char[] chars, Charset charset) {
-        assert chars != null;
-
-        CharBuffer charBuffer = CharBuffer.wrap(chars);
-        ByteBuffer byteBuffer = charset.encode(charBuffer);
-        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
-                byteBuffer.position(), byteBuffer.limit());
-        Arrays.fill(byteBuffer.array(), (byte) 0);
-        return bytes;
+    public static Argon2 createFromEncoded( String encoded ) {
+        throw new UnsupportedOperationException();  // TODO
     }
 
-    public String hash(byte[] password, byte[] salt){
+    public Argon2Result hash(byte[] password, byte[] salt){
         setPassword(password);
         setSalt(salt);
 
         return hash();
     }
 
-    public String hash(char[] password, String salt){
+    public Argon2Result hash(char[] password, String salt){
         setPassword(password);
         setSalt(salt);
 
         return hash();
     }
 
-    public String hash(String password, String salt) {
+    public Argon2Result hash(String password, String salt) {
         setPassword( password.getBytes( charset ) );
         setSalt( salt );
 
         return hash();
     }
 
-    public String hash() {
+    public Argon2Result hash() {
         try {
+            byte[] keepSalt = Arrays.copyOf( salt, salt.length );
             argon2_hash();
-            return getOutputString();
+            return new Argon2Result( type, version, memory, iterations, lanes, keepSalt, output );
         } finally {
             clear();
         }
@@ -109,45 +99,18 @@ public class Argon2 {
 
         Validation.validateInput(this);
 
-        long start = System.nanoTime();
-
         Instance instance = new Instance(this);
 
         Initialize.initialize(instance, this);
         FillMemory.fillMemoryBlocks(instance, executor);
         Finalize.finalize(instance, this);
-
-        duration = (System.nanoTime() - start) / 1000000000.0;
     }
 
     public void clear() {
-        if(password != null)
-            Arrays.fill(password, 0, password.length-1, (byte)0);
-
-        if(salt != null)
-            Arrays.fill(salt, 0, salt.length-1, (byte)0);
-
-        if(secret != null)
-            Arrays.fill(secret, 0, secret.length-1, (byte)0);
-
-        if(additional != null)
-            Arrays.fill(additional, 0, additional.length-1, (byte)0);
-    }
-
-    void printSummary(){
-        if(encodedOnly)
-            System.out.println(getEncoded());
-        else if(rawOnly)
-            System.out.println(getOutputString());
-        else {
-            System.out.println("Type:\t\t" + type);
-            System.out.println("Iterations:\t" + iterations);
-            System.out.println("Memory:\t\t" + memory + " KiB");
-            System.out.println("Parallelism:\t" + lanes);
-            System.out.println("Hash:\t\t" + getOutputString());
-            System.out.println("Encoded:\t " + getEncoded());
-            System.out.println(duration + " seconds");
-        }
+        clearArray( password );
+        clearArray( salt );
+        clearArray( secret );
+        clearArray( additional );
     }
 
     public Argon2 setMemoryInKiB(int memory) {
@@ -291,18 +254,6 @@ public class Argon2 {
 
     public Charset getCharset() {
         return charset;
-    }
-
-    public void setEncodedOnly(boolean encodedOnly) {
-        this.encodedOnly = encodedOnly;
-    }
-
-    public void setRawOnly(boolean rawOnly) {
-        this.rawOnly = rawOnly;
-    }
-
-    public String getEncoded() {
-        return ""; //TODO
     }
 
     public Executor getExecutor() {

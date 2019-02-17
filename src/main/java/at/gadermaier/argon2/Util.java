@@ -1,5 +1,11 @@
 package at.gadermaier.argon2;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+
+
 public class Util {
 
     public static String bytesToHexString(byte[] bytes) {
@@ -58,5 +64,19 @@ public class Util {
         return littleEndianBytesToLong(bytes);
     }
 
-}
+    static byte[] toByteArray(char[] chars, Charset charset) {
+        assert chars != null;
 
+        CharBuffer charBuffer = CharBuffer.wrap( chars);
+        ByteBuffer byteBuffer = charset.encode( charBuffer);
+        byte[] bytes = Arrays.copyOfRange( byteBuffer.array(),
+                                           byteBuffer.position(), byteBuffer.limit());
+        Arrays.fill(byteBuffer.array(), (byte) 0);
+        return bytes;
+    }
+
+    static void clearArray(byte[] arr) {
+        if (arr != null)
+            Arrays.fill( arr, 0, arr.length - 1, (byte)0 );
+    }
+}
