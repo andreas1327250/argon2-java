@@ -14,6 +14,14 @@ public class Example {
 
         byte[] hash = Argon2.create().hash(password, salt).asBytes();
     }
+
+    public static void example2() {
+
+        String password = sendFromUser();
+        String encoded = readFromDatabase();
+
+        boolean result = Argon2().checkHash( encoded, password );
+    }
 }
 ```
 

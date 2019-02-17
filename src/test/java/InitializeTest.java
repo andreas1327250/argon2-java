@@ -4,6 +4,8 @@ import at.gadermaier.argon2.model.Instance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.Charset;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -15,8 +17,8 @@ public class InitializeTest {
     @BeforeEach
     public void setUp(){
         argon2 = Argon2.create()
-                       .setPassword("password".toCharArray())
-                       .setSalt("saltsalt");
+                       .setPassword("password".getBytes( Charset.forName( "UTF-8" ) ))
+                       .setSalt("saltsalt".getBytes( Charset.forName( "UTF-8" ) ));
     }
 
     @Test

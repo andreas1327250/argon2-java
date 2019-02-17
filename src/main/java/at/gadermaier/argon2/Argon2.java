@@ -37,7 +37,7 @@ public class Argon2 {
     private Argon2Type type;
 
     private boolean clearMemory = true;
-    private Charset charset = Charset.forName("UTF-8");
+    private static Charset charset = Charset.forName("UTF-8");
 
     private ExecutorService executor;
 
@@ -58,14 +58,14 @@ public class Argon2 {
         return new Argon2();
     }
 
-    public static Argon2 createFromEncoded( String encoded ) {
+    private static Argon2 createFromEncoded( String encoded ) {
 
         String[] parts = encoded.split( "\\$" );
-        Argon2Type type = parts[1].endsWith( "i" ) ? Argon2i :
-                          parts[1].endsWith( "d" ) ? Argon2d :
-                          parts[1].endsWith( "id" ) ? Argon2id : null;
+        Argon2Type type = parts[1].endsWith( "id" ) ? Argon2id :
+                          parts[1].endsWith( "i" ) ? Argon2i :
+                          parts[1].endsWith( "d" ) ? Argon2d : null;
         boolean hasVersion = !parts[2].startsWith( "m=" );
-        String version = hasVersion ? parts[2].split( "=" )[1] : "19";
+        String version = hasVersion ? parts[2].split( "=" )[1] : "16";
         String[] paramParts = (hasVersion ? parts[3] : parts[2]).split( "," );
         String m = paramParts[0].split( "=" )[1];
         String t = paramParts[1].split( "=" )[1];
@@ -87,6 +87,24 @@ public class Argon2 {
         return instance;
     }
 
+    public static boolean checkHash( String encoded, byte[] password ) {
+
+        Argon2 argon2 = Argon2.createFromEncoded( encoded );
+        byte[] expectedHash = Arrays.copyOf( argon2.getOutput(), argon2.getOutput().length );
+        argon2.setPassword( password );
+        Argon2Result result = argon2.hash();
+
+        return Arrays.equals( result.asByte(), expectedHash );
+    }
+
+    public static boolean checkHash( String encoded, String password ) {
+        return checkHash( encoded, password.getBytes( charset ) );
+    }
+
+    public static boolean checkHash( String encoded, String password, Charset charset ) {
+        return checkHash( encoded, password.getBytes( charset ) );
+    }
+
     public Argon2Result hash(byte[] password, byte[] salt){
         setPassword(password);
         setSalt(salt);
@@ -94,16 +112,20 @@ public class Argon2 {
         return hash();
     }
 
-    public Argon2Result hash(char[] password, String salt){
-        setPassword(password);
-        setSalt(salt);
+    public Argon2Result hash(char[] password, String salt, Charset charset){
+        setPassword(toByteArray( password, charset ));
+        setSalt(salt.getBytes( charset ));
 
         return hash();
     }
 
     public Argon2Result hash(String password, String salt) {
+        return hash( password, salt, charset );
+    }
+
+    public Argon2Result hash(String password, String salt, Charset charset) {
         setPassword( password.getBytes( charset ) );
-        setSalt( salt );
+        setSalt( salt.getBytes( charset ) );
 
         return hash();
     }
@@ -148,14 +170,6 @@ public class Argon2 {
     public Argon2 setParallelism(int parallelism){
         this.lanes = parallelism;
         return this;
-    }
-
-    public Argon2 setPassword(char[] password) {
-        return setPassword(toByteArray(password, charset));
-    }
-
-    public Argon2 setSalt(String salt) {
-        return setSalt(salt.getBytes(charset));
     }
 
     public byte[] getOutput() {
@@ -277,10 +291,6 @@ public class Argon2 {
 
     public void setClearMemory(boolean clearMemory) {
         this.clearMemory = clearMemory;
-    }
-
-    public Charset getCharset() {
-        return charset;
     }
 
     public Executor getExecutor() {

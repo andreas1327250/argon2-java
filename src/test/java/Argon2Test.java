@@ -2,7 +2,7 @@ import at.gadermaier.argon2.Argon2;
 import at.gadermaier.argon2.Argon2Result;
 import at.gadermaier.argon2.model.Argon2Type;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import static at.gadermaier.argon2.Constants.ARGON2_VERSION_10;
 import static at.gadermaier.argon2.Constants.ARGON2_VERSION_13;
@@ -146,7 +146,7 @@ class Argon2Test {
         );
     }
 
-    @EnabledIfSystemProperty( named = "LARGE_RAM",matches = "true")
+    @EnabledIfEnvironmentVariable( named = "LARGE_RAM", matches = "true" )
     @Test
     void testLargeRam() {
 
@@ -162,19 +162,44 @@ class Argon2Test {
         );
     }
 
+    private Argon2Result test(
+            Argon2Type type, int version, int iterations, int memory, int parallelism, int outputLength,
+            String password, String salt ) {
+
+        return Argon2.create()
+                     .setType( type )
+                     .setVersion( version )
+                     .setIterations( iterations )
+                     .setMemory( memory )
+                     .setParallelism( parallelism )
+                     .setOutputLength( outputLength )
+                     .hash( password, salt );
+    }
+
     private void testHash(
             Argon2Type type, int version, int iterations, int memory, int parallelism, int outputLength,
             String password, String salt, String passwordRef, String mcfref ) {
 
-        Argon2Result result = Argon2.create()
-                                    .setType( type )
-                                    .setVersion( version )
-                                    .setIterations( iterations )
-                                    .setMemory( memory )
-                                    .setParallelism( parallelism )
-                                    .setOutputLength( outputLength )
-                                    .hash( password.toCharArray(), salt );
+        assertResult(
+                test( type, version, iterations, memory, parallelism, outputLength, password, salt ),
+                password, passwordRef, mcfref
+        );
+    }
 
+    private void assertResult( Argon2Result result, String password, String passwordRef, String encoded ) {
         assertThat( result.asString() ).isEqualTo( passwordRef );
+        assertThat( Argon2.checkHash( encoded, password ) ).isTrue();
+    }
+
+    @Test
+    void testEncoded() {
+        String encoded = test( Argon2i, 19, 3, 12, 1, 32, "password", "somesalt" ).asEncoded();
+        assertThat( encoded ).isEqualTo( "$argon2i$v=19$m=4096,t=3,p=1$c29tZXNhbHQ$iWh06vD8Fy27wf9npn6FXWiCX4K6pW6Ue1Bnzz07Z8A" );
+
+        encoded = test( Argon2id, 19, 3, 12, 1, 32, "password", "somesalt" ).asEncoded();
+        assertThat( encoded ).isEqualTo( "$argon2id$v=19$m=4096,t=3,p=1$c29tZXNhbHQ$qLml5cbqFAO6YxVHhrSBHP0UWdxrIxkNcM8aMX3blzU" );
+
+        encoded = test( Argon2id, 16, 4, 16, 4, 32, "password", "somesalt" ).asEncoded();
+        assertThat( encoded ).isEqualTo( "$argon2id$v=16$m=65536,t=4,p=4$c29tZXNhbHQ$ZjGrB2S6NxRX2/v18DtFDrfZ3EhCImmES6nAppGsU2w" );
     }
 }
