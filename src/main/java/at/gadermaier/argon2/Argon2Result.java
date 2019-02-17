@@ -1,9 +1,9 @@
 package at.gadermaier.argon2;
 
 import at.gadermaier.argon2.model.Argon2Type;
-import com.google.common.io.BaseEncoding;
 
 import java.util.Arrays;
+import java.util.Base64;
 
 import static at.gadermaier.argon2.Util.bytesToHexString;
 
@@ -43,8 +43,8 @@ public final class Argon2Result {
         String type = this.type.equals( Argon2Type.Argon2i ) ? "i" :
                       this.type.equals( Argon2Type.Argon2d ) ? "d" :
                       this.type.equals( Argon2Type.Argon2id ) ? "id" : null;
-        String salt = BaseEncoding.base64().omitPadding().encode( this.salt );
-        String hash = BaseEncoding.base64().omitPadding().encode( this.hash );
+        String salt = Base64.getEncoder().withoutPadding().encodeToString( this.salt );
+        String hash = Base64.getEncoder().withoutPadding().encodeToString( this.hash );
 
         return new StringBuilder()
                 .append( "$argon2" )

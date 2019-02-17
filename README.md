@@ -1,7 +1,8 @@
 Fork of [https://github.com/andreas1327250/argon2-java]()
 
+* Java 8+
+* No dependency (removed commons-cli)
 * Refactored to be used as a library
-* Removed commons-cli
 
 
 ```java
