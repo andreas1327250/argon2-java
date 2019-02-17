@@ -11,10 +11,10 @@ import static at.gadermaier.argon2.model.Argon2Type.Argon2id;
 import static com.google.common.truth.Truth.assertThat;
 
 
-public class Argon2Test {
+class Argon2Test {
 
     @Test
-    public void testI10() {
+    void testI10() {
         testHash( Argon2i, ARGON2_VERSION_10, 2, 16, 1, 32, "password", "somesalt",
                   "f6c4db4a54e2a370627aff3db6176b94a2a209a62c8e36152711802f7b30c694",
                   "$argon2i$m=65536,t=2,p=1$c29tZXNhbHQ" +
@@ -176,6 +176,5 @@ public class Argon2Test {
                                     .hash( password.toCharArray(), salt );
 
         assertThat( result.asString() ).isEqualTo( passwordRef );
-//        assertThat( result.asEncoded() ).isEqualTo( mcfref );
     }
 }

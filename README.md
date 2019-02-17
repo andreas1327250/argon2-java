@@ -6,16 +6,13 @@ Fork of [https://github.com/andreas1327250/argon2-java]()
 
 ```java
 public class Example {
-    
-    private static final ExecutorService executor = Executors.newCachedThreadPool();
-    
+
     public static void example1() {
-        
+
         String password = "password";
         String salt = "somesalt";
-        
-        Argon2 hasher = Argon2.create().setExecutor(executor);
-        byte[] hash = hasher.hashAsBytes(password, salt);
+
+        byte[] hash = Argon2.create().hash(password, salt).asBytes();
     }
 }
 ```

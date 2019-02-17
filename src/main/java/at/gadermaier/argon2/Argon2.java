@@ -5,6 +5,7 @@ import at.gadermaier.argon2.algorithm.Finalize;
 import at.gadermaier.argon2.algorithm.Initialize;
 import at.gadermaier.argon2.model.Argon2Type;
 import at.gadermaier.argon2.model.Instance;
+import com.google.common.io.BaseEncoding;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import java.util.concurrent.Executors;
 import static at.gadermaier.argon2.Constants.Defaults.*;
 import static at.gadermaier.argon2.Util.clearArray;
 import static at.gadermaier.argon2.Util.toByteArray;
+import static at.gadermaier.argon2.model.Argon2Type.*;
 
 
 public class Argon2 {
@@ -57,7 +59,32 @@ public class Argon2 {
     }
 
     public static Argon2 createFromEncoded( String encoded ) {
-        throw new UnsupportedOperationException();  // TODO
+
+        String[] parts = encoded.split( "\\$" );
+        Argon2Type type = parts[1].endsWith( "i" ) ? Argon2i :
+                          parts[1].endsWith( "d" ) ? Argon2d :
+                          parts[1].endsWith( "id" ) ? Argon2id : null;
+        boolean hasVersion = !parts[2].startsWith( "m=" );
+        String version = hasVersion ? parts[2].split( "=" )[1] : "19";
+        String[] paramParts = (hasVersion ? parts[3] : parts[2]).split( "," );
+        String m = paramParts[0].split( "=" )[1];
+        String t = paramParts[1].split( "=" )[1];
+        String p = paramParts[2].split( "=" )[1];
+
+        String saltEncoded = hasVersion ? parts[4] : parts[3];
+        byte[] salt = BaseEncoding.base64().decode( saltEncoded );
+        String hashEncoded = hasVersion ? parts[5] : parts[4];
+        byte[] hash = BaseEncoding.base64().decode( hashEncoded );
+
+        Argon2 instance = new Argon2();
+        instance.setType( type );
+        instance.setVersion( Integer.parseInt( version ) );
+        instance.setMemoryInKiB( Integer.parseInt( m ) );
+        instance.setIterations( Integer.parseInt( t ) );
+        instance.setParallelism( Integer.parseInt( p ) );
+        instance.setSalt( salt );
+        instance.setOutput( hash );
+        return instance;
     }
 
     public Argon2Result hash(byte[] password, byte[] salt){
