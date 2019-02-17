@@ -18,7 +18,7 @@ public class Example {
 
     public static void example2() {
 
-        String password = sendFromUser();
+        String password = sentFromUser();
         String encoded = readFromDatabase();
 
         boolean result = Argon2().checkHash( encoded, password );
