@@ -11,7 +11,7 @@ import at.gadermaier.argon2.Argon2;
 import at.gadermaier.argon2.model.Argon2Type;
 
 /**
- * Tests this Argon2 implementation (pure in java) against the implementation 
+ * Tests this Argon2 implementation (pure in java) against the implementation "argon2-jvm" in version 2.5.
  */
 public class TestAgainstReferenceImpl {
 
