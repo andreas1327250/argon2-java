@@ -19,6 +19,7 @@ public class TestAgainstReferenceImpl {
 
 	@Test
 	public void testSameHashes() {
+		System.out.println("VM processors: " + Runtime.getRuntime().availableProcessors());
 		for (int i = 1; i < 35; i++) {
 			System.out.println("Iteration " + i);
 			Random random = new Random(i);
@@ -47,23 +48,31 @@ public class TestAgainstReferenceImpl {
 		Argon2 argon2 = Argon2.create().setVersion(version).setType(type).setOutputLength(OUTLEN_DEF);
 		de.mkammerer.argon2.Argon2Advanced referenceArgon2 = de.mkammerer.argon2.Argon2Factory.createAdvanced(referenceType);
 
-		long base = System.currentTimeMillis();
+		System.gc();
+		long timeBaseReference = System.currentTimeMillis();
+		long memoryBaseReference = Runtime.getRuntime().freeMemory();
 		String referenceHash = referenceHash(referenceArgon2, iterations, memory, parallelism, password, salt);
-		long timeReferenceHashComputation = System.currentTimeMillis();
+		long memoryReference = memoryBaseReference - Runtime.getRuntime().freeMemory();
+		long timeReference = System.currentTimeMillis();
+		
+		System.gc();
+		long timeBaseArgon2 = System.currentTimeMillis();
+		long memoryBaseArgon2 = Runtime.getRuntime().freeMemory();
 		String hash = hash(argon2, iterations, memory, parallelism, password, Arrays.copyOf(salt, salt.length));
-		long timeHashComputation = System.currentTimeMillis();
-		logTime(timeReferenceHashComputation - base, timeHashComputation - timeReferenceHashComputation);
-
+		long memoryArgon2 = memoryBaseArgon2 - Runtime.getRuntime().freeMemory();
+		long timeArgon2 = System.currentTimeMillis();
+		logTime(timeReference - timeBaseReference, timeArgon2 - timeBaseArgon2);
+		System.out.println("Memory usage: reference: " + memoryReference + ", argon2: " + memoryArgon2 + ", overhead: " + (((((float)memoryArgon2) / memoryReference) - 1) * 100) + "%");
 		Assert.assertEquals("Hash differs.", referenceHash, hash);
 	}
 
 	private void logTime(long timeReferenceHashComputation, long timeHashComputation) {
 		StringBuilder msg = new StringBuilder();
-		msg.append("Reference implementation (");
+		msg.append("CPU usage: reference: ");
 		msg.append(toTime(timeReferenceHashComputation));
-		msg.append(") - Argon2 implementation (");
+		msg.append(", argon2: ");
 		msg.append(toTime(timeHashComputation));
-		msg.append("): Overhead ");
+		msg.append(", overhead: ");
 		msg.append(((((float)timeHashComputation) / timeReferenceHashComputation) -1) * 100);
 		msg.append("%");
 		System.out.println(msg.toString());
