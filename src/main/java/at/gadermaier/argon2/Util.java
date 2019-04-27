@@ -44,18 +44,55 @@ public class Util {
         return result;
     }
 
-    public static byte[] longToLittleEndianBytes(long a) {
+    public static byte[] longToLittleEndianBytes(long value) {
         byte[] result = new byte[8];
-        result[0] = (byte) (a & 0xFF);
-        result[1] = (byte) ((a >> 8) & 0xFF);
-        result[2] = (byte) ((a >> 16) & 0xFF);
-        result[3] = (byte) ((a >> 24) & 0xFF);
-        result[4] = (byte) ((a >> 32) & 0xFF);
-        result[5] = (byte) ((a >> 40) & 0xFF);
-        result[6] = (byte) ((a >> 48) & 0xFF);
-        result[7] = (byte) ((a >> 56) & 0xFF);
+        writeLong(result, 0, value);
         return result;
     }
+
+	public static int writeLong(byte[] result, int offset, long value) {
+		result[offset++] = byte0(value);
+        result[offset++] = byte1(value);
+        result[offset++] = byte2(value);
+        result[offset++] = byte3(value);
+        result[offset++] = byte4(value);
+        result[offset++] = byte5(value);
+        result[offset++] = byte6(value);
+        result[offset++] = byte7(value);
+        return offset;
+	}
+
+	private static byte byte0(long value) {
+		return (byte) (value & 0xFF);
+	}
+
+	private static byte byte1(long value) {
+		return (byte) ((value >> 8) & 0xFF);
+	}
+
+	private static byte byte2(long value) {
+		return (byte) ((value >> 16) & 0xFF);
+	}
+
+	private static byte byte3(long value) {
+		return (byte) ((value >> 24) & 0xFF);
+	}
+
+	private static byte byte4(long value) {
+		return (byte) ((value >> 32) & 0xFF);
+	}
+
+	private static byte byte5(long value) {
+		return (byte) ((value >> 40) & 0xFF);
+	}
+
+	private static byte byte6(long value) {
+		return (byte) ((value >> 48) & 0xFF);
+	}
+
+	private static byte byte7(long value) {
+		return (byte) ((value >> 56) & 0xFF);
+	}
 
     public static long intToLong(int x){
     	return x & 0xFFFFFFFFL;

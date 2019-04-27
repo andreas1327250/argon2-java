@@ -1,12 +1,11 @@
 package at.gadermaier.argon2.model;
 
 
-import at.gadermaier.argon2.Util;
+import static at.gadermaier.argon2.Constants.*;
 
 import java.util.Arrays;
 
-import static at.gadermaier.argon2.Constants.ARGON2_BLOCK_SIZE;
-import static at.gadermaier.argon2.Constants.ARGON2_QWORDS_IN_BLOCK;
+import at.gadermaier.argon2.Util;
 
 public class Block {
 
@@ -29,15 +28,15 @@ public class Block {
     public byte[] toBytes() {
         byte[] result = new byte[ARGON2_BLOCK_SIZE];
 
+        int offset = 0;
         for (int i = 0; i < v.length; i++) {
-            byte[] bytes = Util.longToLittleEndianBytes(v[i]);
-            System.arraycopy(bytes, 0, result, i * bytes.length, bytes.length);
+        	offset = Util.writeLong(result, offset, v[i]);
         }
 
         return result;
     }
 
-    public void copyBlock(Block other) {
+	public void copyBlock(Block other) {
         System.arraycopy(other.v, 0, v, 0, v.length);
     }
 
