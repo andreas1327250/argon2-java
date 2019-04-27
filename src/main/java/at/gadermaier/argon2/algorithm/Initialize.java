@@ -42,11 +42,8 @@ public class Initialize {
         byte[] initialHashWithOnes = getInitialHashLong(initialHash, oneBytes);
 
         for (int i = 0; i < instance.getLanes(); i++) {
-
-            byte[] iBytes = Util.intToLittleEndianBytes(i);
-
-            System.arraycopy(iBytes, 0, initialHashWithZeros, ARGON2_PREHASH_DIGEST_LENGTH + 4, 4);
-            System.arraycopy(iBytes, 0, initialHashWithOnes, ARGON2_PREHASH_DIGEST_LENGTH + 4, 4);
+            Util.writeInt(initialHashWithZeros, ARGON2_PREHASH_DIGEST_LENGTH + 4, i);
+            Util.writeInt(initialHashWithOnes, ARGON2_PREHASH_DIGEST_LENGTH + 4, i);
 
             byte[] blockhashBytes = Functions.blake2bLong(initialHashWithZeros, ARGON2_BLOCK_SIZE);
             instance.memory[i * instance.getLaneLength() + 0].fromBytes(blockhashBytes);

@@ -41,7 +41,7 @@ public class Util {
         return result;
     }
 
-	private static int writeInt(byte[] result, int offset, int value) {
+	public static int writeInt(byte[] result, int offset, int value) {
 		result[offset++] = byte0(value);
         result[offset++] = byte1(value);
         result[offset++] = byte2(value);
