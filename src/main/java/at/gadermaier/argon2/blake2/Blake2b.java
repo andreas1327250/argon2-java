@@ -35,6 +35,8 @@ import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 
+import at.gadermaier.argon2.Util;
+
 
 /**  */
 public interface Blake2b {
@@ -49,6 +51,9 @@ public interface Blake2b {
 	/** */
 	void update(byte input);
 
+	/** */
+	void update(int input);
+	
 	/** */
 	void update(byte[] input, int offset, int len);
 
@@ -314,8 +319,6 @@ public interface Blake2b {
 		 * compressor cache buffer offset/cached data length
 		 */
 		private int buflen;
-		/** to support update(byte) */
-		private         byte[] oneByte;
 
 		/** Basic use constructor pending (TODO) JCA/JCE compliance */
 		Engine() {
@@ -331,7 +334,6 @@ public interface Blake2b {
 			assert param != null : "param is null";
 			this.param = param;
 			this.buffer = new byte[Spec.block_bytes];
-			this.oneByte = new byte[1];
 			this.outlen = param.getDigestLength();
 
 			if (param.getDepth() > Param.Default.depth) {
@@ -450,10 +452,18 @@ public interface Blake2b {
 
 		/** {@inheritDoc} */
 		@Override final public void update (byte b) {
-			oneByte[0] = b;
-			update (oneByte, 0, 1);
+			flush();
+			buffer[buflen++] = b;
 		}
 
+		/** {@inheritDoc} */
+		@Override final public void update (int bytes) {
+			update(Util.byte0(bytes));
+			update(Util.byte1(bytes));
+			update(Util.byte2(bytes));
+			update(Util.byte3(bytes));
+		}
+		
 		/** {@inheritDoc} */
 		@Override final public void update(byte[] input) {
 			update (input, 0, input.length);

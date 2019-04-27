@@ -1,10 +1,10 @@
 package at.gadermaier.argon2.algorithm;
 
+import static at.gadermaier.argon2.Constants.*;
+
 import at.gadermaier.argon2.Util;
 import at.gadermaier.argon2.blake2.Blake2b;
 import at.gadermaier.argon2.model.Block;
-
-import static at.gadermaier.argon2.Constants.*;
 
 class Functions {
 
@@ -13,13 +13,13 @@ class Functions {
      * H0 = H64(p, τ, m, t, v, y, |P|, P, |S|, S, |L|, K, |X|, X)
      * -> 64 byte (ARGON2_PREHASH_DIGEST_LENGTH)
      */
-    static byte[] initialHash(byte[] lanes, byte[] outputLength,
-                              byte[] memory, byte[] iterations,
-                              byte[] version, byte[] type,
-                              byte[] passwordLength, byte[] password,
-                              byte[] saltLength, byte[] salt,
-                              byte[] secretLength, byte[] secret,
-                              byte[] additionalLength, byte[] additional) {
+    static byte[] initialHash(int lanes, int outputLength,
+                              int memory, int iterations,
+                              int version, int type,
+                              int passwordLength, byte[] password,
+                              int saltLength, byte[] salt,
+                              int secretLength, byte[] secret,
+                              int additionalLength, byte[] additional) {
 
 
         Blake2b.Param params = new Blake2b.Param()

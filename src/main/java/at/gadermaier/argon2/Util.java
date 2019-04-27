@@ -37,12 +37,33 @@ public class Util {
 
     public static byte[] intToLittleEndianBytes(int a) {
         byte[] result = new byte[4];
-        result[0] = (byte) (a & 0xFF);
-        result[1] = (byte) ((a >> 8) & 0xFF);
-        result[2] = (byte) ((a >> 16) & 0xFF);
-        result[3] = (byte) ((a >> 24) & 0xFF);
+        writeInt(result, 0, a);
         return result;
     }
+
+	private static int writeInt(byte[] result, int offset, int value) {
+		result[offset++] = byte0(value);
+        result[offset++] = byte1(value);
+        result[offset++] = byte2(value);
+        result[offset++] = byte3(value);
+        return offset;
+	}
+
+	public static byte byte0(int a) {
+		return (byte) (a & 0xFF);
+	}
+
+	public static byte byte1(int a) {
+		return (byte) ((a >> 8) & 0xFF);
+	}
+
+	public static byte byte2(int a) {
+		return (byte) ((a >> 16) & 0xFF);
+	}
+
+	public static byte byte3(int a) {
+		return (byte) ((a >> 24) & 0xFF);
+	}
 
     public static byte[] longToLittleEndianBytes(long value) {
         byte[] result = new byte[8];
