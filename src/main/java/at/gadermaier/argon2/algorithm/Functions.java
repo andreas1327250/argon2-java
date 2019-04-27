@@ -3,7 +3,6 @@ package at.gadermaier.argon2.algorithm;
 import static at.gadermaier.argon2.Constants.*;
 
 import at.gadermaier.argon2.blake2.Blake2b;
-import at.gadermaier.argon2.model.Block;
 
 class Functions {
 
@@ -112,52 +111,5 @@ class Functions {
         blake2b.update(input);
 
         return blake2b.digest();
-    }
-
-    static void roundFunction(Block block,
-                              int v0, int v1, int v2, int v3,
-                              int v4, int v5, int v6, int v7,
-                              int v8, int v9, int v10, int v11,
-                              int v12, int v13, int v14, int v15) {
-
-        F(block, v0, v4, v8, v12);
-        F(block, v1, v5, v9, v13);
-        F(block, v2, v6, v10, v14);
-        F(block, v3, v7, v11, v15);
-
-        F(block, v0, v5, v10, v15);
-        F(block, v1, v6, v11, v12);
-        F(block, v2, v7, v8, v13);
-        F(block, v3, v4, v9, v14);
-    }
-
-    private static void F(Block block, int a, int b, int c, int d) {
-        fBlaMka(block, a, b);
-        rotr64(block, d, a, 32);
-
-        fBlaMka(block, c, d);
-        rotr64(block, b, c, 24);
-
-        fBlaMka(block, a, b);
-        rotr64(block, d, a, 16);
-
-        fBlaMka(block, c, d);
-        rotr64(block, b, c, 63);
-    }
-
-    /*designed by the Lyra PHC team */
-    /* a <- a + b + 2*aL*bL
-     * + == addition modulo 2^64
-     * aL = least 32 bit */
-    private static void fBlaMka(Block block, int x, int y) {
-        final long m = 0xFFFFFFFFL;
-        final long xy = (block.v[x] & m) * (block.v[y] & m);
-
-        block.v[x] = block.v[x] + block.v[y] + 2 * xy;
-    }
-
-    private static void rotr64(Block block, int v, int w, long c) {
-        final long temp = block.v[v] ^ block.v[w];
-        block.v[v] = (temp >>> c) | (temp << (64 - c));
     }
 }
