@@ -1,4 +1,4 @@
-import static at.gadermaier.argon2.Constants.Defaults.OUTLEN_DEF;
+import static at.gadermaier.argon2.Constants.Defaults.*;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -98,6 +98,13 @@ public class TestAgainstReferenceImpl {
 		res.append(ms);
 		res.append("ms");
 		return res.toString();
+	}
+	
+	/**
+	 * Runs the benchmark from the command line.
+	 */
+	public static void main(String[] args) {
+		new TestAgainstReferenceImpl().testSameHashes();
 	}
 	
 }
