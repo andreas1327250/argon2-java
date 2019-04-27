@@ -1,12 +1,13 @@
-import at.gadermaier.argon2.Argon2;
-import at.gadermaier.argon2.algorithm.Initialize;
-import at.gadermaier.argon2.model.Instance;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.charset.Charset;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import at.gadermaier.argon2.Argon2;
+import at.gadermaier.argon2.algorithm.Initialize;
+import at.gadermaier.argon2.model.Instance;
 
 
 public class InitializeTest {
@@ -27,6 +28,6 @@ public class InitializeTest {
         Instance instance = new Instance(argon2);
         Initialize.initialize(instance, argon2);
 
-        assertEquals(instanceNull, instance.memory[0].toString());
+        assertEquals(instanceNull, instance.memory(0).toString());
     }
 }

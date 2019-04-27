@@ -3,12 +3,11 @@ package at.gadermaier.argon2.algorithm;
 import at.gadermaier.argon2.model.Block;
 
 class FillBlock {
+	
+	private Block R = new Block();
+	private Block Z = new Block();
 
-    static void fillBlock(Block X, Block Y, Block currentBlock, boolean withXor) {
-
-        Block R = new Block();
-        Block Z = new Block();
-
+    void fillBlock(Block X, Block Y, Block currentBlock, boolean withXor) {
         R.xor(X, Y);
         Z.copyBlock(R);
 

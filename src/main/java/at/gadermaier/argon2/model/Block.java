@@ -69,7 +69,7 @@ public class Block {
         return result.toString();
     }
 
-    void clear() {
+    public void clear() {
         Arrays.fill(v, 0);
     }
 }

@@ -46,10 +46,10 @@ public class Initialize {
             Util.writeInt(initialHashWithOnes, ARGON2_PREHASH_DIGEST_LENGTH + 4, i);
 
             byte[] blockhashBytes = Functions.blake2bLong(initialHashWithZeros, ARGON2_BLOCK_SIZE);
-            instance.memory[i * instance.getLaneLength() + 0].fromBytes(blockhashBytes);
+            instance.memory(i * instance.getLaneLength() + 0).fromBytes(blockhashBytes);
 
             blockhashBytes = Functions.blake2bLong(initialHashWithOnes, ARGON2_BLOCK_SIZE);
-            instance.memory[i * instance.getLaneLength() + 1].fromBytes(blockhashBytes);
+            instance.memory(i * instance.getLaneLength() + 1).fromBytes(blockhashBytes);
         }
     }
 
