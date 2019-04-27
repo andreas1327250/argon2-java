@@ -27,13 +27,13 @@
 package at.gadermaier.argon2.blake2;
 
 
+import static at.gadermaier.argon2.blake2.Blake2b.Engine.Assert.*;
+import static at.gadermaier.argon2.blake2.Blake2b.Engine.LittleEndian.*;
+
 import java.io.PrintStream;
 import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
-
-import static at.gadermaier.argon2.blake2.Blake2b.Engine.Assert.*;
-import static at.gadermaier.argon2.blake2.Blake2b.Engine.LittleEndian.*;
 
 
 /**  */
@@ -415,12 +415,7 @@ public interface Blake2b {
 						len -= Spec.block_bytes;
 						off += Spec.block_bytes;
 					}
-				} else if ( buflen == Spec.block_bytes ) {
-					/* flush */
-					this.t[0] += Spec.block_bytes;
-					this.t[1] += this.t[0] == 0 ? 1 : 0;
-					compress( buffer, 0 );
-					buflen = 0;
+				} else if (flush()) {
 					continue;
 				}
 
@@ -434,6 +429,23 @@ public interface Blake2b {
 				len -= fill;
 				off += fill;
 			}
+		}
+
+		/** 
+		 * Flushes the {@link #buffer}, if it is full.
+		 * 
+		 * @return Whether a flush happened (and the buffer is empty after the operation).
+		 */
+		private boolean flush() {
+			boolean full = buflen == Spec.block_bytes;
+			if ( full ) {
+				/* flush */
+				this.t[0] += Spec.block_bytes;
+				this.t[1] += this.t[0] == 0 ? 1 : 0;
+				compress( buffer, 0 );
+				buflen = 0;
+			}
+			return full;
 		}
 
 		/** {@inheritDoc} */
