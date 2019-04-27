@@ -58,10 +58,7 @@ public class Util {
     }
 
     public static long intToLong(int x){
-        byte[] intBytes = intToLittleEndianBytes(x);
-        byte[] bytes = new byte[8];
-        System.arraycopy(intBytes, 0, bytes, 0, 4);
-        return littleEndianBytesToLong(bytes);
+    	return x & 0xFFFFFFFFL;
     }
 
     static byte[] toByteArray(char[] chars, Charset charset) {
