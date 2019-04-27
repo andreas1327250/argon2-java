@@ -19,9 +19,10 @@ public class Block {
     public void fromBytes(byte[] input) {
         assert (input.length == ARGON2_BLOCK_SIZE);
 
+        int offset = 0;
         for (int i = 0; i < v.length; i++) {
-            byte[] slice = Arrays.copyOfRange(input, i * 8, (i + 1) * 8);
-            v[i] = Util.littleEndianBytesToLong(slice);
+            v[i] = Util.readLong(input, offset);
+            offset += 8;
         }
     }
 

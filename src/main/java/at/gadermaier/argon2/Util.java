@@ -26,20 +26,14 @@ public class Util {
         return data;
     }
 
-    public static long littleEndianBytesToLong(byte[] b) {
-        long result = 0;
-        for (int i = 7; i >= 0; i--) {
+	public static long readLong(byte[] buffer, int offset) {
+		long result = 0;
+        for (int i = offset + 7; i >= offset; i--) {
             result <<= 8;
-            result |= (b[i] & 0xFF);
+            result |= (buffer[i] & 0xFF);
         }
         return result;
-    }
-
-    public static byte[] intToLittleEndianBytes(int a) {
-        byte[] result = new byte[4];
-        writeInt(result, 0, a);
-        return result;
-    }
+	}
 
 	public static int writeInt(byte[] result, int offset, int value) {
 		result[offset++] = byte0(value);
