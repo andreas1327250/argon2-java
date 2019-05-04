@@ -8,12 +8,12 @@ public class Finalize {
 
     public static void finalize(Instance instance, Argon2 argon2) {
 
-        Block finalBlock = instance.memory[instance.getLaneLength() - 1];
+        Block finalBlock = instance.memory(instance.getLaneLength() - 1);
 
         /* XOR the last blocks */
         for (int i = 1; i < instance.getLanes(); i++) {
             int lastBlockInLane = i * instance.getLaneLength() + (instance.getLaneLength() - 1);
-            finalBlock.xorWith(instance.memory[lastBlockInLane]);
+            finalBlock.xorWith(instance.memory(lastBlockInLane));
         }
 
         byte[] finalBlockBytes = finalBlock.toBytes();

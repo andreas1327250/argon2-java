@@ -89,3 +89,6 @@ aws.properties
 
 .vagrant/
 Vagrantfile
+
+.gradle/
+build/

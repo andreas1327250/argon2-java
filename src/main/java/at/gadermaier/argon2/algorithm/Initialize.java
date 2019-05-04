@@ -1,29 +1,29 @@
 package at.gadermaier.argon2.algorithm;
 
+import static at.gadermaier.argon2.Constants.*;
+
 import at.gadermaier.argon2.Argon2;
 import at.gadermaier.argon2.Util;
 import at.gadermaier.argon2.model.Instance;
-
-import static at.gadermaier.argon2.Constants.*;
 
 public class Initialize {
 
 
     public static void initialize(Instance instance, Argon2 argon2) {
         byte[] initialHash = Functions.initialHash(
-                Util.intToLittleEndianBytes(argon2.getLanes()),
-                Util.intToLittleEndianBytes(argon2.getOutputLength()),
-                Util.intToLittleEndianBytes(argon2.getMemory()),
-                Util.intToLittleEndianBytes(argon2.getIterations()),
-                Util.intToLittleEndianBytes(argon2.getVersion()),
-                Util.intToLittleEndianBytes(argon2.getType().ordinal()),
-                Util.intToLittleEndianBytes(argon2.getPasswordLength()),
+                argon2.getLanes(),
+                argon2.getOutputLength(),
+                argon2.getMemory(),
+                argon2.getIterations(),
+                argon2.getVersion(),
+                argon2.getType().ordinal(),
+                argon2.getPasswordLength(),
                 argon2.getPassword(),
-                Util.intToLittleEndianBytes(argon2.getSaltLength()),
+                argon2.getSaltLength(),
                 argon2.getSalt(),
-                Util.intToLittleEndianBytes(argon2.getSecretLength()),
+                argon2.getSecretLength(),
                 argon2.getSecret(),
-                Util.intToLittleEndianBytes(argon2.getAdditionalLength()),
+                argon2.getAdditionalLength(),
                 argon2.getAdditional()
         );
         fillFirstBlocks(instance, initialHash);
@@ -42,17 +42,14 @@ public class Initialize {
         byte[] initialHashWithOnes = getInitialHashLong(initialHash, oneBytes);
 
         for (int i = 0; i < instance.getLanes(); i++) {
-
-            byte[] iBytes = Util.intToLittleEndianBytes(i);
-
-            System.arraycopy(iBytes, 0, initialHashWithZeros, ARGON2_PREHASH_DIGEST_LENGTH + 4, 4);
-            System.arraycopy(iBytes, 0, initialHashWithOnes, ARGON2_PREHASH_DIGEST_LENGTH + 4, 4);
+            Util.writeInt(initialHashWithZeros, ARGON2_PREHASH_DIGEST_LENGTH + 4, i);
+            Util.writeInt(initialHashWithOnes, ARGON2_PREHASH_DIGEST_LENGTH + 4, i);
 
             byte[] blockhashBytes = Functions.blake2bLong(initialHashWithZeros, ARGON2_BLOCK_SIZE);
-            instance.memory[i * instance.getLaneLength() + 0].fromBytes(blockhashBytes);
+            instance.memory(i * instance.getLaneLength() + 0).fromBytes(blockhashBytes);
 
             blockhashBytes = Functions.blake2bLong(initialHashWithOnes, ARGON2_BLOCK_SIZE);
-            instance.memory[i * instance.getLaneLength() + 1].fromBytes(blockhashBytes);
+            instance.memory(i * instance.getLaneLength() + 1).fromBytes(blockhashBytes);
         }
     }
 

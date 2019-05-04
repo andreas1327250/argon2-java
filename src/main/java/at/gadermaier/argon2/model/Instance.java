@@ -1,12 +1,12 @@
 package at.gadermaier.argon2.model;
 
-import at.gadermaier.argon2.Argon2;
+import static at.gadermaier.argon2.Constants.*;
 
-import static at.gadermaier.argon2.Constants.ARGON2_SYNC_POINTS;
+import at.gadermaier.argon2.Argon2;
 
 public class Instance {
 
-    public Block[] memory;
+    private Block[] memory;
     private int version;
     private int iterations;
     private int segmentLength;
@@ -53,6 +53,14 @@ public class Instance {
         memory = null;
     }
 
+    public final int memoryLength() {
+    	return memory.length;
+    }
+    
+    public final Block memory(int index) {
+    	return memory[index];
+    }
+    
     public Block[] getMemory() {
         return memory;
     }

@@ -1,5 +1,11 @@
 package at.gadermaier.argon2;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+
+
 public class Util {
 
     public static String bytesToHexString(byte[] bytes) {
@@ -20,43 +26,106 @@ public class Util {
         return data;
     }
 
-    public static long littleEndianBytesToLong(byte[] b) {
-        long result = 0;
-        for (int i = 7; i >= 0; i--) {
+	public static long readLong(byte[] buffer, int offset) {
+		long result = 0;
+        for (int i = offset + 7; i >= offset; i--) {
             result <<= 8;
-            result |= (b[i] & 0xFF);
+            result |= (buffer[i] & 0xFF);
         }
         return result;
-    }
+	}
 
-    public static byte[] intToLittleEndianBytes(int a) {
-        byte[] result = new byte[4];
-        result[0] = (byte) (a & 0xFF);
-        result[1] = (byte) ((a >> 8) & 0xFF);
-        result[2] = (byte) ((a >> 16) & 0xFF);
-        result[3] = (byte) ((a >> 24) & 0xFF);
-        return result;
-    }
+	public static int writeInt(byte[] result, int offset, int value) {
+		result[offset++] = byte0(value);
+        result[offset++] = byte1(value);
+        result[offset++] = byte2(value);
+        result[offset++] = byte3(value);
+        return offset;
+	}
 
-    public static byte[] longToLittleEndianBytes(long a) {
+	public static byte byte0(int a) {
+		return (byte) (a & 0xFF);
+	}
+
+	public static byte byte1(int a) {
+		return (byte) ((a >> 8) & 0xFF);
+	}
+
+	public static byte byte2(int a) {
+		return (byte) ((a >> 16) & 0xFF);
+	}
+
+	public static byte byte3(int a) {
+		return (byte) ((a >> 24) & 0xFF);
+	}
+
+    public static byte[] longToLittleEndianBytes(long value) {
         byte[] result = new byte[8];
-        result[0] = (byte) (a & 0xFF);
-        result[1] = (byte) ((a >> 8) & 0xFF);
-        result[2] = (byte) ((a >> 16) & 0xFF);
-        result[3] = (byte) ((a >> 24) & 0xFF);
-        result[4] = (byte) ((a >> 32) & 0xFF);
-        result[5] = (byte) ((a >> 40) & 0xFF);
-        result[6] = (byte) ((a >> 48) & 0xFF);
-        result[7] = (byte) ((a >> 56) & 0xFF);
+        writeLong(result, 0, value);
         return result;
     }
+
+	public static int writeLong(byte[] result, int offset, long value) {
+		result[offset++] = byte0(value);
+        result[offset++] = byte1(value);
+        result[offset++] = byte2(value);
+        result[offset++] = byte3(value);
+        result[offset++] = byte4(value);
+        result[offset++] = byte5(value);
+        result[offset++] = byte6(value);
+        result[offset++] = byte7(value);
+        return offset;
+	}
+
+	private static byte byte0(long value) {
+		return (byte) (value & 0xFF);
+	}
+
+	private static byte byte1(long value) {
+		return (byte) ((value >> 8) & 0xFF);
+	}
+
+	private static byte byte2(long value) {
+		return (byte) ((value >> 16) & 0xFF);
+	}
+
+	private static byte byte3(long value) {
+		return (byte) ((value >> 24) & 0xFF);
+	}
+
+	private static byte byte4(long value) {
+		return (byte) ((value >> 32) & 0xFF);
+	}
+
+	private static byte byte5(long value) {
+		return (byte) ((value >> 40) & 0xFF);
+	}
+
+	private static byte byte6(long value) {
+		return (byte) ((value >> 48) & 0xFF);
+	}
+
+	private static byte byte7(long value) {
+		return (byte) ((value >> 56) & 0xFF);
+	}
 
     public static long intToLong(int x){
-        byte[] intBytes = intToLittleEndianBytes(x);
-        byte[] bytes = new byte[8];
-        System.arraycopy(intBytes, 0, bytes, 0, 4);
-        return littleEndianBytesToLong(bytes);
+    	return x & 0xFFFFFFFFL;
     }
 
-}
+    static byte[] toByteArray(char[] chars, Charset charset) {
+        assert chars != null;
 
+        CharBuffer charBuffer = CharBuffer.wrap( chars);
+        ByteBuffer byteBuffer = charset.encode( charBuffer);
+        byte[] bytes = Arrays.copyOfRange( byteBuffer.array(),
+                                           byteBuffer.position(), byteBuffer.limit());
+        Arrays.fill(byteBuffer.array(), (byte) 0);
+        return bytes;
+    }
+
+    static void clearArray(byte[] arr) {
+        if (arr != null)
+            Arrays.fill( arr, 0, arr.length - 1, (byte)0 );
+    }
+}

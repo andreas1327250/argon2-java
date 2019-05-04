@@ -1,5 +1,7 @@
 package at.gadermaier.argon2.algorithm;
 
+import static at.gadermaier.argon2.Constants.*;
+
 import at.gadermaier.argon2.Constants;
 import at.gadermaier.argon2.Util;
 import at.gadermaier.argon2.model.Argon2Type;
@@ -7,13 +9,17 @@ import at.gadermaier.argon2.model.Block;
 import at.gadermaier.argon2.model.Instance;
 import at.gadermaier.argon2.model.Position;
 
-import static at.gadermaier.argon2.Constants.ARGON2_ADDRESSES_IN_BLOCK;
-import static at.gadermaier.argon2.Constants.ARGON2_VERSION_10;
-
 
 class FillSegment {
 
-    static void fillSegment(Instance instance, Position position) {
+    private final FillBlock filler = new FillBlock();
+    
+    private final Block _addressBlock = new Block();
+    private final Block _zeroBlock = new Block();
+    private final Block _inputBlock = new Block();
+
+
+    void fillSegment(Instance instance, Position position) {
 
         Block addressBlock = null, inputBlock = null, zeroBlock = null;
 
@@ -23,9 +29,13 @@ class FillSegment {
         int prevOffset = getPrevOffset(instance, currentOffset);
 
         if (dataIndependentAddressing) {
-            addressBlock = new Block();
-            zeroBlock = new Block();
-            inputBlock = new Block();
+            addressBlock = _addressBlock;
+            zeroBlock = _zeroBlock;
+            inputBlock = _inputBlock;
+            
+            addressBlock.clear();
+            zeroBlock.clear();
+            inputBlock.clear();
 
             initAddressBlocks(instance, position, zeroBlock, inputBlock, addressBlock);
         }
@@ -38,12 +48,12 @@ class FillSegment {
             int refColumn = getRefColumn(instance, position, pseudoRandom, refLane == position.lane);
 
             /* 2 Creating a new block */
-            Block prevBlock = instance.memory[prevOffset];
-            Block refBlock = instance.memory[((instance.getLaneLength()) * refLane + refColumn)];
-            Block currentBlock = instance.memory[currentOffset];
+            Block prevBlock = instance.memory(prevOffset);
+            Block refBlock = instance.memory(((instance.getLaneLength()) * refLane + refColumn));
+            Block currentBlock = instance.memory(currentOffset);
 
             boolean withXor = isWithXor(instance, position);
-            FillBlock.fillBlock(prevBlock, refBlock, currentBlock, withXor);
+            filler.fillBlock(prevBlock, refBlock, currentBlock, withXor);
         }
     }
 
@@ -55,11 +65,11 @@ class FillSegment {
                 );
     }
 
-    private static void initAddressBlocks(Instance instance, Position position, Block zeroBlock, Block inputBlock, Block addressBlock) {
+    private void initAddressBlocks(Instance instance, Position position, Block zeroBlock, Block inputBlock, Block addressBlock) {
         inputBlock.v[0] = Util.intToLong(position.pass);
         inputBlock.v[1] = Util.intToLong(position.lane);
         inputBlock.v[2] = Util.intToLong(position.slice);
-        inputBlock.v[3] = Util.intToLong(instance.memory.length);
+        inputBlock.v[3] = Util.intToLong(instance.memoryLength());
         inputBlock.v[4] = Util.intToLong(instance.getIterations());
         inputBlock.v[5] = Util.intToLong(instance.getType().ordinal());
 
@@ -98,22 +108,22 @@ class FillSegment {
         }
     }
 
-    private static void nextAddresses(Block zeroBlock, Block inputBlock, Block addressBlock) {
+    private void nextAddresses(Block zeroBlock, Block inputBlock, Block addressBlock) {
         inputBlock.v[6]++;
-        FillBlock.fillBlock(zeroBlock, inputBlock, addressBlock, false);
-        FillBlock.fillBlock(zeroBlock, addressBlock, addressBlock, false);
+        filler.fillBlock(zeroBlock, inputBlock, addressBlock, false);
+        filler.fillBlock(zeroBlock, addressBlock, addressBlock, false);
     }
 
     /* 1.2 Computing the index of the reference block */
     /* 1.2.1 Taking pseudo-random value from the previous block */
-    private static long getPseudoRandom(Instance instance, Position position, Block addressBlock, Block inputBlock, Block zeroBlock, int prevOffset, boolean dataIndependentAddressing) {
+    private long getPseudoRandom(Instance instance, Position position, Block addressBlock, Block inputBlock, Block zeroBlock, int prevOffset, boolean dataIndependentAddressing) {
         if (dataIndependentAddressing) {
             if (position.index % ARGON2_ADDRESSES_IN_BLOCK == 0) {
                 nextAddresses(zeroBlock, inputBlock, addressBlock);
             }
             return addressBlock.v[position.index % ARGON2_ADDRESSES_IN_BLOCK];
         } else {
-            return instance.memory[prevOffset].v[0];
+            return instance.memory(prevOffset).v[0];
         }
     }
 
