@@ -1,6 +1,6 @@
 # Argon2 Java implementation
 
-This is a pure Java implementation of [Argon2](https://github.com/P-H-C/phc-winner-argon2). It targets Java 6.
+This is a pure Java implementation of [Argon2](https://github.com/P-H-C/phc-winner-argon2). It targets Java 8.
 
 Many parts are just taken from the C code and converted to Java syntax - there shouldn't be any major performance bottlenecks anymore, but speed can't keep up quite with the C implementation.
 
