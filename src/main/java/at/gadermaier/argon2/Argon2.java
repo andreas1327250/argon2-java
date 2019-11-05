@@ -16,6 +16,7 @@ import static at.gadermaier.argon2.Constants.Defaults.*;
 public class Argon2 {
 
     private byte[] output;
+    private String encoded;
     private int outputLength; // -l N
     private double duration;
 
@@ -32,7 +33,7 @@ public class Argon2 {
     private Argon2Type type;
 
     private boolean clearMemory = true;
-    private Charset charset = Charset.forName("UTF-8");
+    private final Charset charset = Charset.forName("UTF-8");
 
     private boolean encodedOnly = false;
     private boolean rawOnly = false;
@@ -276,6 +277,10 @@ public class Argon2 {
     }
 
     public String getEncoded() {
-        return ""; //TODO
+        return encoded;
+    }
+
+    public void setEncoded(String encoded) {
+        this.encoded = encoded;
     }
 }
